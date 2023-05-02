@@ -5,6 +5,10 @@ const express = require('express');
 const morgan = require('morgan');
 const { sequelize } = require('./models');
 
+//FIXME - These import statements produce errors 
+// const authenticate = require('./middleware/auth-user') 
+// const asyncHandler = require('./middleware/async-handler')
+
 (async () => {
   try {
 
@@ -32,6 +36,7 @@ app.use(morgan('dev'));
 
 // setup a friendly greeting for the root route
 app.get('/', (req, res) => {
+
   res.json({
     message: 'Welcome to the REST API project!',
   });
