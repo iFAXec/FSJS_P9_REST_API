@@ -2,12 +2,11 @@
 
 // load modules
 const express = require('express');
+const { authenticateUser } = require('./middleware/auth-user')
+const { asyncHandler } = require('./middleware/async-handler')
 const morgan = require('morgan');
 const { sequelize } = require('./models');
 
-//FIXME - These import statements produce errors 
-// const authenticate = require('./middleware/auth-user') 
-// const asyncHandler = require('./middleware/async-handler')
 
 (async () => {
   try {
@@ -31,16 +30,19 @@ const enableGlobalErrorLogging = process.env.ENABLE_GLOBAL_ERROR_LOGGING === 'tr
 // create the Express app
 const app = express();
 
+
+
 // setup morgan which gives us http request logging
 app.use(morgan('dev'));
 
 // setup a friendly greeting for the root route
-app.get('/', (req, res) => {
-
+app.get('/users', authenticateUser, asyncHandler((req, res) => {
+  const user = req.currentUser;
   res.json({
-    message: 'Welcome to the REST API project!',
+    name: user.name,
+    username: user.username,
   });
-});
+}));
 
 // send 404 if no other route matched
 app.use((req, res) => {
