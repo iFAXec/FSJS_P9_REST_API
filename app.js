@@ -2,9 +2,8 @@
 
 // load modules
 const express = require('express');
-const { authenticateUser } = require('./middleware/auth-user')
-const { asyncHandler } = require('./middleware/async-handler')
 const morgan = require('morgan');
+const routes = require('./routes/routes');
 const { sequelize } = require('./models');
 
 
@@ -30,19 +29,15 @@ const enableGlobalErrorLogging = process.env.ENABLE_GLOBAL_ERROR_LOGGING === 'tr
 // create the Express app
 const app = express();
 
+// Setup request body JSON parsing.
+app.use(express.json());
 
+app.use('/api', routes);
 
 // setup morgan which gives us http request logging
 app.use(morgan('dev'));
 
-// setup a friendly greeting for the root route
-app.get('/users', authenticateUser, asyncHandler((req, res) => {
-  const user = req.currentUser;
-  res.json({
-    name: user.name,
-    username: user.username,
-  });
-}));
+
 
 // send 404 if no other route matched
 app.use((req, res) => {
