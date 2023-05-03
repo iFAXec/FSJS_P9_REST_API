@@ -10,7 +10,7 @@ const router = express.Router();
 
 
 // Route that returns a list of authenticated users 
-router.get('/users', authenticateUser, asyncHandler((req, res) => {
+router.get('/', authenticateUser, asyncHandler((req, res) => {
     //users that have passed the authentication process are assigned to req as a property
     const user = req.currentUser;
     res.status(200).json({
