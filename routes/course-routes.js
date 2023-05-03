@@ -2,24 +2,17 @@
 
 const express = require('express');
 const { asyncHandler } = require('../middleware/async-handler');
-const { User } = require('../models/user');
-const { Course } = require('../models/course');
+const { User, Course, Sequelize } = require('../models');
 const { authenticateUser } = require('../middleware/auth-user');
-const { sequelize } = require('../models');
-const course = require('../models/course');
-
-
 
 //construct a router instance
 const router = express.Router();
 
 //Send a GET request to /courses to READ all courses
-
 router.get('/', asyncHandler(async (req, res, next) => {
     const courses = await Course.findAll({
         include: [{
             model: User,
-            as: 'user',
             where: { id: Sequelize.col('Course.userId') }, //foreign key condition
             attributes: ['firstName', 'lastName', 'emailAddress']//specific attributes from the user model
         }]
@@ -33,7 +26,6 @@ router.get('/:id', asyncHandler(async (req, res, next) => {
     const course = await Course.findByPk(req.params.id, {
         include: [{
             model: User,
-            as: 'user',
             where: { id: Sequelize.col('Course.userId') }, //foreign key condition
             attributes: ['firstName', 'lastName', 'emailAddress']//specific attributes from the user model
         }]
@@ -67,9 +59,52 @@ router.post('/', authenticateUser, asyncHandler(async (req, res, next) => {
 }));
 
 //Send a PUT request to /courses/:id to UPDATE (edit) a course
+router.put('/:id', authenticateUser, asyncHandler(async (req, res, next) => {
+
+    try {
+        const course = await Course.findByPk(req.params.id);
+        if (course) {
+            await course.update({
+                title: req.body.title,
+                description: req.body.description
+            });
+            res.status(204).end();
+        } else {
+            res.status(404).json({ message: 'course not found' });
+
+        }
+    } catch (error) {
+        if (error.name === 'SequelizeValidationError') {
+            const errors = error.errors.map(err => err.message);
+            res.status(400).json({ errors })
+        } else {
+            next(error);
+        }
+    }
+}));
+
+
 //Send a DELETE to /courses/:id to request to DELETE a course
+router.delete('/:id', authenticateUser, asyncHandler(async (req, res, next) => {
 
+    try {
+        const course = await Course.findByPk(req.params.id);
+        if (course) {
+            await course.destroy();
+            res.status(204).end();
+        } else {
+            res.status(404).json({ message: 'course not found' });
 
+        }
+    } catch (error) {
+        if (error.name === 'SequelizeValidationError') {
+            const errors = error.errors.map(err => err.message);
+            res.status(400).json({ errors })
+        } else {
+            next(error);
+        }
+    }
+}));
 
 
 
