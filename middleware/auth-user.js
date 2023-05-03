@@ -2,7 +2,8 @@
 
 const auth = require('basic-auth');
 const bcrypt = require('bcrypt');
-const User = require('../models/user');
+const { User } = require('../models/user');
+console.log('User :', User);
 
 
 
