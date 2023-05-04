@@ -64,14 +64,18 @@ router.put('/:id', authenticateUser, asyncHandler(async (req, res, next) => {
     try {
         const course = await Course.findByPk(req.params.id);
         if (course) {
-            await course.update({
-                title: req.body.title,
-                description: req.body.description
-            });
-            res.status(204).end();
+            if (course.userId == req.currentUser.id) {
+                await course.update({
+                    title: req.body.title,
+                    description: req.body.description
+                });
+                res.status(200).json({ message: `User with id ${req.currentUser.id} is not the owner of the course with id ${course.id}` });
+
+            } else {
+                res.status(403).json({ message: `User with id ${req.currentUser.id} is not the owner of the course with id ${course.id}` });
+            }
         } else {
             res.status(404).json({ message: 'course not found' });
-
         }
     } catch (error) {
         if (error.name === 'SequelizeValidationError') {
@@ -90,7 +94,7 @@ router.delete('/:id', authenticateUser, asyncHandler(async (req, res, next) => {
     try {
         const course = await Course.findByPk(req.params.id);
         if (course) {
-            if (course.userId === req.currentUser.id) {
+            if (course.userId == req.currentUser.id) {
                 await course.destroy();
                 res.status(200).json({
                     message: `Course with id ${course.id} has been deleted by ${req.currentUser.firstName}`
