@@ -14,13 +14,15 @@ router.get('/', authenticateUser, asyncHandler((req, res) => {
     //users that have passed the authentication process are assigned to req as a property
     const user = req.currentUser;
     res.status(200).json({
-        name: user.name,
-        username: user.username,
+        id: user.id,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        emailAddress: user.emailAddress
     });
 }));
 
 //Route that  creates a new user 
-router.post('/', asyncHandler(async (req, res) => {
+router.post('/', authenticateUser, asyncHandler(async (req, res) => {
 
     try {
         await User.create(req.body);

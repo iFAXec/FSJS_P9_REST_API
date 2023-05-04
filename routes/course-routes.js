@@ -90,8 +90,14 @@ router.delete('/:id', authenticateUser, asyncHandler(async (req, res, next) => {
     try {
         const course = await Course.findByPk(req.params.id);
         if (course) {
-            await course.destroy();
-            res.status(204).end();
+            if (course.userId === req.currentUser.id) {
+                await course.destroy();
+                res.status(200).json({
+                    message: `Course with id ${course.id} has been deleted by ${req.currentUser.firstName}`
+                });
+            } else {
+                res.status(403).json({ message: `User with id ${req.currentUser.id} is not the owner of the course with id ${course.id}` });
+            }
         } else {
             res.status(404).json({ message: 'course not found' });
 
@@ -105,7 +111,5 @@ router.delete('/:id', authenticateUser, asyncHandler(async (req, res, next) => {
         }
     }
 }));
-
-
 
 module.exports = router;
