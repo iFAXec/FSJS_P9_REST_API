@@ -59,20 +59,23 @@ module.exports = (sequelize) => {
             allowNull: false,
             set(val) {
                 if (val) {
-                    const hashedPassword = bcrypt.hashSync(val, 10);
-                    this.setDataValue('password', hashedPassword);
+
+                    if (val.length < 5 || val.length > 10) {
+                        throw new Error('The password should be between 5 and 10 characters in length');
+                    } else {
+                        const hashedPassword = bcrypt.hashSync(val, 10);
+                        this.setDataValue('password', hashedPassword);
+                        // console.log('password :', this.password);
+                    }
                 };
             },
+
             validate: {
                 notNull: {
                     msg: 'Password is required'
                 },
                 notEmpty: {
                     msg: 'Please provide a password'
-                },
-                len: {
-                    args: [5, 10],
-                    msg: 'The password should be between 5 and 10 characters in length'
                 },
             },
         },
