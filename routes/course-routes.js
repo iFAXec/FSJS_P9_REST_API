@@ -9,6 +9,11 @@ const { authenticateUser } = require('../middleware/auth-user');
 const router = express.Router();
 
 //Send a GET request to /courses to READ all courses
+/**
+ * Retrieve all the course details 
+ * include user  attributes - firstName, lastName and emailAddress 
+ * exclude createdAt and updateAt attributes 
+ */
 router.get('/', asyncHandler(async (req, res, next) => {
     const courses = await Course.findAll({
         attributes: { exclude: ['createdAt', 'updatedAt'] },
@@ -21,7 +26,13 @@ router.get('/', asyncHandler(async (req, res, next) => {
     res.status(200).json(courses);
 }));
 
+
 //Send a GET request to /courses/:id to READ (view) a course
+/**
+ * Retrieve course based on the id
+ * include user  attributes - firstName, lastName and emailAddress
+ * exclude createdAt and updateAt attributes    
+ */
 router.get('/:id', asyncHandler(async (req, res, next) => {
 
     const course = await Course.findByPk(req.params.id, {
@@ -42,6 +53,10 @@ router.get('/:id', asyncHandler(async (req, res, next) => {
 }));
 
 //Send a POST request to /courses to CREATE a course
+/**
+ * Create a new course, set the Location header to the URI for the newly created course
+ * Return a 201 HTTP status code and no content.
+ */
 router.post('/', authenticateUser, asyncHandler(async (req, res, next) => {
 
     try {
@@ -61,6 +76,10 @@ router.post('/', authenticateUser, asyncHandler(async (req, res, next) => {
 }));
 
 //Send a PUT request to /courses/:id to UPDATE (edit) a course
+/** 
+ * Create a PUT route that will update the corresponding course 
+ * and return a 204 HTTP status code and no content.
+*/
 router.put('/:id', authenticateUser, asyncHandler(async (req, res, next) => {
 
     try {
@@ -89,7 +108,10 @@ router.put('/:id', authenticateUser, asyncHandler(async (req, res, next) => {
     }
 }));
 
-
+/**
+ * Create a DELETE route that will delete the corresponding course 
+ * and return a 204 HTTP status code and no content. 
+ */
 //Send a DELETE to /courses/:id to request to DELETE a course
 router.delete('/:id', authenticateUser, asyncHandler(async (req, res, next) => {
 

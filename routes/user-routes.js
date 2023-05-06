@@ -10,7 +10,11 @@ const { authenticateUser } = require('../middleware/auth-user');
 const router = express.Router();
 
 
-// Route that returns a list of authenticated users 
+// Route that returns a list of authenticated users
+/**
+ * Create a GET route that will return all properties and values for the currently authenticated User 
+ * set the status code to 200
+ */
 router.get('/', authenticateUser, asyncHandler(async (req, res) => {
     //users that have passed the authentication process are assigned to req as a property
     const user = await req.currentUser;
@@ -22,6 +26,10 @@ router.get('/', authenticateUser, asyncHandler(async (req, res) => {
     });
 }));
 
+/**
+ *  Create a POST route that will create a new user, set the Location header to "/",
+ * Return a 201 HTTP status code and no content.
+ */
 //Route that  creates a new user 
 router.post('/', asyncHandler(async (req, res) => {
 
