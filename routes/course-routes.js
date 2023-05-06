@@ -11,6 +11,7 @@ const router = express.Router();
 //Send a GET request to /courses to READ all courses
 router.get('/', asyncHandler(async (req, res, next) => {
     const courses = await Course.findAll({
+        attributes: { exclude: ['createdAt', 'updatedAt'] },
         include: [{
             model: User,
             where: { id: Sequelize.col('Course.userId') }, //foreign key condition
@@ -24,6 +25,7 @@ router.get('/', asyncHandler(async (req, res, next) => {
 router.get('/:id', asyncHandler(async (req, res, next) => {
 
     const course = await Course.findByPk(req.params.id, {
+        attributes: { exclude: ['createdAt', 'updatedAt'] },
         include: [{
             model: User,
             where: { id: Sequelize.col('Course.userId') }, //foreign key condition
@@ -69,10 +71,10 @@ router.put('/:id', authenticateUser, asyncHandler(async (req, res, next) => {
                     title: req.body.title,
                     description: req.body.description
                 });
-                res.status(200).json({ message: `User with id ${req.currentUser.id} is not the owner of the course with id ${course.id}` });
+                res.status(204).end();
 
             } else {
-                res.status(403).json({ message: `User with id ${req.currentUser.id} is not the owner of the course with id ${course.id}` });
+                res.status(403).json({ message: `User with id ${req.currentUser.id} is not authorised to update the course` });
             }
         } else {
             res.status(404).json({ message: 'course not found' });
@@ -96,11 +98,9 @@ router.delete('/:id', authenticateUser, asyncHandler(async (req, res, next) => {
         if (course) {
             if (course.userId == req.currentUser.id) {
                 await course.destroy();
-                res.status(200).json({
-                    message: `Course with id ${course.id} has been deleted by ${req.currentUser.firstName}`
-                });
+                res.status(204).end();
             } else {
-                res.status(403).json({ message: `User with id ${req.currentUser.id} is not the owner of the course with id ${course.id}` });
+                res.status(403).json({ message: `User with id ${req.currentUser.id} is not authorised to delete the course` });
             }
         } else {
             res.status(404).json({ message: 'course not found' });
